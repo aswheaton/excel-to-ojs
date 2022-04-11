@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import pandas as pd
+import shutil
 
 def view_headers(dataframe):
     print(dataframe[0,:])
@@ -27,4 +27,25 @@ Notes:
 6. Not clear wwhat purpose the final column serves.
 """
 
-view_column(dataframe, "")
+#
+for volume in range(1, 41):
+    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"):
+        os.makedirs("bepress_xml/"+str(volume)+"/1/", mode=0o666)
+
+
+
+for row in range(1, dataframe.shape[0]):
+
+    #Get essential info out of the file.
+    volume_no = int(dataframe[row][5])
+    issue_no = 1
+
+
+    # Devise a new filename for the file.
+    old_filename = dataframe[row][10]
+    new_filename = old_filename
+    # Copy the file to its new directory, if not already present.
+    src = os.path.join("database/articles/", old_filename)
+    dst = os.path.join("bepress_xml/", volume_no, issue_no, new_filename)
+    if not os.isfile(dst):
+        shutil.copy2(src, dst)
