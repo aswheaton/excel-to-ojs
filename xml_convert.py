@@ -103,7 +103,7 @@ for row in range(1, 10):#dataframe.shape[0]):
     indent_level += 1
 
     authors = dataframe[row][0]
-    author_list = authors.split(delimiter=";")
+    author_list = authors.split(";")
     for author in author_list:
         f.write(indent()+"<author>\n")
         indent_level += 1
@@ -134,4 +134,4 @@ indent_level -= 1
 f.write(indent()+"</document>\n")
 
 indent_level -=1
-f.write(indent(indent_level)+"</documents>")
+f.write(indent()+"</documents>")
