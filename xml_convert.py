@@ -2,7 +2,15 @@ import os
 import numpy as np
 import shutil
 
+log = open("log", "w")
+f = open('metadata.xml', 'w')
+indent_level = 0
+
+dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
+log.write("Successfully loaded CSV file into dataframe.\n")
+
 def view_headers(dataframe):
+
     print(dataframe[0,:])
     log.write("Viewing dataframe headers, they are {}.\n".format(dataframe[0,:]))
 
@@ -13,15 +21,33 @@ def view_column(dataframe, column_name):
         print(row, dataframe[row][col])
 
 def indent():
+
     return(indent_level * 8 * " ")
 
-log = open("log", "w")
+def open_tag(tag_name):
 
-dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
-log.write("Successfully loaded CSV file into dataframe.\n")
+    global indent_level
+    f.write(indent()+"<"+tag_name+">\n")
+    indent_level += 1
 
-# The column names are ['Authors' 'Title' 'Sec_title' 'Year_pub' 'Section' 'Volume' 'Page_start' 'Page_end' 'Abstract' 'EnteredBy' 'FileName' '']
-view_headers(dataframe)
+def close_tag(tag_name):
+
+    global indent_level
+    indent_level -= 1
+    f.write(indent()+"</"+tag_name+">\n")
+
+def tag(tag_name, tag_content, **kwargs):
+
+    f.write(indent())
+    # Open the tag with any keyword arguments.
+    f.write("<"+tag_name)
+    for key, value in kwargs:
+        f.write(" "+key+"=\""+value)+"\""
+    f.write(">")
+    # Fill the tag with content.
+    f.write(tag_content)
+    # Close the tag and move to newline.
+    f.write("</"+tag_name+">\n")
 
 """
 Notes:
@@ -34,7 +60,6 @@ Notes:
 6. Not clear wwhat purpose the final column serves.
 7. Some filenames in database have capital P, although no such file exists.
 """
-
 
 for volume in range(1, 42):
     if not os.path.exists("bepress_xml/"+str(volume)+"/1/"):
@@ -65,29 +90,27 @@ for row in range(1, 10): # dataframe.shape[0]):
             else:
                 pass
 
-f = open('metadata.xml', 'w')
-indent_level = 0
-
 # Begin writing to the metadata document.
 f.write("<?xml version='1.0' encoding='utf-8' ?>\n")
-indent_level += 1
-f.write(indent()+"<documents>\n")
-indent_level += 1
-
+open_tag("documents")
+open_tag("document")
 
 for row in range(1, 10):#dataframe.shape[0]):
 
     title = dataframe[row][1]
-    f.write(indent()+"<titles>\n")
-    indent_level += 1
-    f.write(indent()+"<title>\n")
-    indent_level += 1
-    f.write(indent()+title+"\n")
-    indent_level -= 1
-    f.write(indent()+"</title>\n")
-    indent_level -= 1
-    f.write(indent()+"</titles>\n")
-    indent_level -= 1
+    # f.write(indent()+"<titles>\n")
+    # indent_level += 1
+    # f.write(indent()+"<title>\n")
+    # indent_level += 1
+    # f.write(indent()+title+"\n")
+    # indent_level -= 1
+    # f.write(indent()+"</title>\n")
+    # indent_level -= 1
+    # f.write(indent()+"</titles>\n")
+    # indent_level -= 1
+    open_tag("titles")
+    tag("title", title)
+    close_tag("titles")
 
     volume_no = int(dataframe[row][5])
     pubyear = dataframe[row][3]
@@ -95,43 +118,70 @@ for row in range(1, 10):#dataframe.shape[0]):
         pubdate = str(pubyear)+"-06-30:T00:00:00-07:00" # Why this particular date format?
     elif volume_no % 2 == 0:
         pubdate = str(pubyear)+"-12-31:T00:00:00-07:00" # Why this particular date format?
+    # f.write(indent()+"<publication-date>" + pubdate + "</publication-date>" + "\n")
+    # f.write(indent()+"<state>published</state>\n")
+    tag("publication-date", pubdate)
+    tag("state", "published")
 
-    f.write(indent()+"<publication-date>" + pubdate + "</publication-date>" + "\n")
-    f.write(indent()+"<state>published</state>\n")
-
-    f.write(indent()+"<authors>\n")
-    indent_level += 1
+    # f.write(indent()+"<authors>\n")
+    # indent_level += 1
+    open_tag("authors")
 
     authors = dataframe[row][0]
-    author_list = authors.split(";")
+    author_list = authors.split(";").strip()
     for author in author_list:
-        f.write(indent()+"<author>\n")
-        indent_level += 1
-        f.write(indent()+"<lname>"+author.split(" ")[0]+"</lname>\n")
-        f.write(indent()+"<fname>"+author.split(" ")[-1]+"</fname>\n")
+
+        open_tag("author")
+
+        lname = author.split(" ")[0].strip(",")
+        tag("lname", lname)
         try:
-            f.write(indent()+"<mname>"+author.split(" ")[1]+"</mname>\n")
+            fname = author.split(" ")[1].strip()
+            tag("fname", fname)
         except IndexError:
             pass
-        indent_level -= 1
-        f.write(indent()+"</author>\n")
+        try:
+            mname = author.split(" ")[2].strip()
+            tag("mname", mname)
+        except IndexError:
+            pass
 
-    indent_level -= 1
-    f.write(indent()+"</authors>\n")
+        close_tag("author")
+
+        # f.write(indent()+"<author>\n")
+        # indent_level += 1
+        # f.write(indent()+"<lname>"+author.split(" ")[0]+"</lname>\n")
+        # f.write(indent()+"<fname>"+author.split(" ")[-1]+"</fname>\n")
+        # try:
+        #     f.write(indent()+"<mname>"+author.split(" ")[1]+"</mname>\n")
+        # except IndexError:
+        #     pass
+        # indent_level -= 1
+        # f.write(indent()+"</author>\n")
+
+    # indent_level -= 1
+    # f.write(indent()+"</authors>\n")
+    close_tag("authors")
 
     abstract = dataframe[row][8]
-    f.write(indent()+"<abstract>"+abstract+"</abstract>\n")
+    # f.write(indent()+"<abstract>"+abstract+"</abstract>\n")
+    tag("abstract", abstract)
 
     section = dataframe[row][4]
-    f.write(indent()+"<document-type>"+section+"</document-type>\n")
-    f.write(indent()+"<type>article</type>\n")
+    # f.write(indent()+"<document-type>"+section+"</document-type>\n")
+    # f.write(indent()+"<type>article</type>\n")
+    tag("document-type", section)
+    tag("type", "article")
 
     page_start, page_end = dataframe[row][6], dataframe[row][7]
-    f.write(indent()+"<fpage>"+page_start+"</fpage>\n")
-    f.write(indent()+"<lpage>"+page_end+"</lpage>\n")
+    # f.write(indent()+"<fpage>"+page_start+"</fpage>\n")
+    # f.write(indent()+"<lpage>"+page_end+"</lpage>\n")
+    tag("fpage", page_start)
+    tag("lpage", page_end)
 
-indent_level -= 1
-f.write(indent()+"</document>\n")
-
-indent_level -=1
-f.write(indent()+"</documents>")
+# indent_level -= 1
+# f.write(indent()+"</document>\n")
+# indent_level -=1
+# f.write(indent()+"</documents>")
+close_tag("document")
+close_tag("documents")
