@@ -32,30 +32,40 @@ Notes:
 5. Number of rows does NOT match number of files in database/articles (extra rows)
    It appears that some files are referenced by multiple rows, for short articles.
 6. Not clear wwhat purpose the final column serves.
+7. Some filenames in database have capital P, although no such file exists.
 """
 
-#
-for volume in range(1, 41):
-    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"):
-        os.makedirs("bepress_xml/"+str(volume)+"/1/", mode=0o666)
 
-for row in range(1, dataframe.shape[0]):
+for volume in range(1, 42):
+    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"):
+        os.makedirs("bepress_xml/"+str(volume)+"/1/", mode=0o777)
+        log.write("Created directory bepress_xml/{}/1/ with permissions 777.\n".format(volume))
+
+for row in range(1, 10): # dataframe.shape[0]):
     #Get essential info out of the file.
     volume_no = int(dataframe[row][5])
     issue_no = 1
 
     # Devise a new filename for the file.
-    old_filename = dataframe[row][10]
+    old_filename = str(dataframe[row][10]).lower()
     new_filename = old_filename
+
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename)
     dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), new_filename)
-    if not os.path.exists(dst):
-        shutil.copy2(src, dst) # TODO: Add PDFs to database directory!
+    log.write("Copying file {} to {}.\n".format(src, dst))
 
+    if not os.path.exists(dst):
+        try:
+            shutil.copy2(src, dst)
+        except FileNotFoundError:
+            src = input("No file found at {}, input source or skip: ".format(src))
+            if src != "skip":
+                shutil.copy2(src, dst)
+            else:
+                pass
 
 f = open('metadata.xml', 'w')
-
 indent_level = 0
 
 # Begin writing to the metadata document.
@@ -65,7 +75,7 @@ f.write(indent()+"<documents>\n")
 indent_level += 1
 
 
-for row in range(1, 5):#dataframe.shape[0]):
+for row in range(1, 10):#dataframe.shape[0]):
 
     title = dataframe[row][1]
     f.write(indent()+"<titles>\n")
@@ -74,9 +84,9 @@ for row in range(1, 5):#dataframe.shape[0]):
     indent_level += 1
     f.write(indent()+title+"\n")
     indent_level -= 1
-    f.write(indent()+"</titles>\n")
-    indent_level -= 1
     f.write(indent()+"</title>\n")
+    indent_level -= 1
+    f.write(indent()+"</titles>\n")
     indent_level -= 1
 
     volume_no = int(dataframe[row][5])
