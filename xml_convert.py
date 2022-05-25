@@ -4,6 +4,7 @@ import shutil
 
 def view_headers(dataframe):
     print(dataframe[0,:])
+    log.write("Viewing dataframe headers, they are {}.\n".format(dataframe[0,:]))
 
 def view_column(dataframe, column_name):
     # Get index associated with the column name:
@@ -14,7 +15,10 @@ def view_column(dataframe, column_name):
 def indent():
     return(indent_level * 8 * " ")
 
+log = open("log", "w")
+
 dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
+log.write("Successfully loaded CSV file into dataframe.\n")
 
 # The column names are ['Authors' 'Title' 'Sec_title' 'Year_pub' 'Section' 'Volume' 'Page_start' 'Page_end' 'Abstract' 'EnteredBy' 'FileName' '']
 view_headers(dataframe)
