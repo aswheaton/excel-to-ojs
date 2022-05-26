@@ -22,7 +22,7 @@ def view_column(dataframe, column_name):
 
 def indent():
 
-    return(indent_level * 8 * " ")
+    return(indent_level * "	")
 
 def open_tag(tag_name):
 
@@ -51,14 +51,14 @@ def tag(tag_name, tag_content, **kwargs):
 
 """
 Notes:
-1. Papers with multiple authors have line ending semicolon, single authors do not!
-2. Sec_title column has both "African Elephant and Rhino Group Newsletter" and "Pachyderm".
-3. Capitalisation differs for Section column, i.e. "Rhino Notes" and "Rhino notes".
-4. Volume contains entries for Vol 42, for which there are no filenames.
-5. Number of rows does NOT match number of files in database/articles (extra rows)
-   It appears that some files are referenced by multiple rows, for short articles.
-6. Not clear wwhat purpose the final column serves.
-7. Some filenames in database have capital P, although no such file exists.
+TODO: Papers with multiple authors have line ending semicolon, single authors do not! FIXED!
+TODO: Sec_title column has both "African Elephant and Rhino Group Newsletter" and "Pachyderm".
+TODO: Capitalisation differs for Section column, i.e. "Rhino Notes" and "Rhino notes".
+TODO: Volume contains entries for Vol 42, for which there are no filenames.
+TODO: Number of rows does NOT match number of files in database/articles (extra rows)
+TODO: It appears that some files are referenced by multiple rows, for short articles. FIXED!
+TODO: Not clear wwhat purpose the final column serves. FIXED!
+TODO: Some filenames in database have capital P, although no such file exists. FIXED!
 """
 
 for volume in range(1, 42):
@@ -128,20 +128,26 @@ for row in range(1, 10):#dataframe.shape[0]):
     open_tag("authors")
 
     authors = dataframe[row][0]
-    author_list = authors.split(";").strip()
+    author_list = authors.split(";")
+
     for author in author_list:
 
         open_tag("author")
 
-        lname = author.split(" ")[0].strip(",")
+        names = author.strip().split(" ")
+        lname = names[0].strip(",")
         tag("lname", lname)
+
         try:
-            fname = author.split(" ")[1].strip()
+            fname = names[1]
             tag("fname", fname)
         except IndexError:
             pass
+
         try:
-            mname = author.split(" ")[2].strip()
+            mname = names[2]
+            for i in range(3, len(names)):
+                mname += " " + names[i]
             tag("mname", mname)
         except IndexError:
             pass
