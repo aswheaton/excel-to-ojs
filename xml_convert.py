@@ -115,13 +115,27 @@ for row in range(1, 10): # dataframe.shape[0]):
     volume_no = int(dataframe[row][5])
     issue_no = 1
 
+    # If this is the first article in the first issue, start an article counter at 1.
+    if row == 1:
+        article_no = 1
+    # If this is the beginning of a new issue, reset the article counter.
+    elif volume_no != int(dataframe[row-1][5]):
+        article_no = 1
+    # If the article is in the same issue as the previous, increment the article counter.
+    elif volume_no == int(dataframe[row-1][5]):
+        article_no += 1
+
     # Devise a new filename for the file.
-    old_filename = str(dataframe[row][10]).lower()
-    new_filename = old_filename
+    old_filename = str(dataframe[row][10])
+    new_filename = old_filename.lower()
+
+    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"+article_no):
+        os.makedirs("bepress_xml/"+str(volume)+"/1/"+article_no, mode=0o777)
+        log.write("Created directory bepress_xml/{}/{}/{} with permissions 777.\n".format(volume, issue_no, article_no))
 
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename)
-    dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), new_filename)
+    dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), str(article_no), new_filename)
     log.write("Copying file {} to {}.\n".format(src, dst))
 
     if not os.path.exists(dst):
