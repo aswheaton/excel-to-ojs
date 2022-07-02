@@ -47,8 +47,6 @@ pubdates = {
     }
 
 log = open("log", "w")
-f = open('metadata.xml', 'w')
-indent_level = 0
 
 dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
 log.write("Successfully loaded CSV file into dataframe.\n")
@@ -148,12 +146,15 @@ for row in range(1, 10): # dataframe.shape[0]):
             else:
                 pass
 
-# Begin writing to the metadata document.
-f.write("<?xml version='1.0' encoding='utf-8' ?>\n")
-open_tag("documents")
-open_tag("document")
+    # Now create the requisite metadata file for the article.
+    xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(str(volume_no), str(issue_no), str(article_no))
+    xml_file = open(xml_file_path, "w")
+    indent_level = 0
 
-for row in range(1, 10):#dataframe.shape[0]):
+    # Begin writing to the metadata document.
+    xml_file.write("<?xml version='1.0' encoding='utf-8' ?>\n")
+    open_tag("documents")
+    open_tag("document")
 
     title = dataframe[row][1]
     # f.write(indent()+"<titles>\n")
@@ -243,9 +244,9 @@ for row in range(1, 10):#dataframe.shape[0]):
     tag("fpage", page_start)
     tag("lpage", page_end)
 
-# indent_level -= 1
-# f.write(indent()+"</document>\n")
-# indent_level -=1
-# f.write(indent()+"</documents>")
-close_tag("document")
-close_tag("documents")
+    # indent_level -= 1
+    # f.write(indent()+"</document>\n")
+    # indent_level -=1
+    # f.write(indent()+"</documents>")
+    close_tag("document")
+    close_tag("documents")
