@@ -46,6 +46,20 @@ pubdates = {
     41 : "2006-12-30:T12:00:00+03:00", # JUL-DEC 2006.
     }
 
+author_emails = {
+    "Ghosh"         : "Omitted from public repository.",
+    "Rookmaaker"    : "Omitted from public repository.",
+    "Nishihara"     : "Omitted from public repository.",
+    "Hillman"       : "Omitted from public repository.",
+    "Hillman-Smith" : "Omitted from public repository.",
+    "Stiles"        : "Omitted from public repository.",
+    "Vigne"         : "Omitted from public repository.",
+    "Schulte"       : "Omitted from public repository.",
+    "Lindsay"       : "Omitted from public repository.",
+    "Hoare"         : "Omitted from public repository.",
+    "Potter"        : "Omitted from public repository."
+    }
+
 log = open("log", "w")
 
 dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
