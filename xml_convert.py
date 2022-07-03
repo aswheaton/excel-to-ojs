@@ -100,7 +100,7 @@ TODO: Volume contains entries for Vol 42, for which there are no filenames.
 TODO: Number of rows does NOT match number of files in database/articles (extra rows)
 TODO: It appears that some files are referenced by multiple rows, for short articles. FIXED!
 TODO: Not clear wwhat purpose the final column serves. FIXED!
-TODO: Some filenames in database have capital P, although no such file exists. FIXED!
+TODO: Some filenames in database have capital P, although no such file exists. FIXED, kinda!
 TODO: Check logic of directory structure creation for missing file in row 1.
 """
 
@@ -128,7 +128,7 @@ for row in range(1, 10): # dataframe.shape[0]):
         log.write("Created directory bepress_xml/{}/{}/{} with permissions 777.\n".format(volume_no, issue_no, article_no))
 
     # Copy the file to its new directory, if not already present.
-    src = os.path.join("database/articles/", old_filename)
+    src = os.path.join("database/articles/", old_filename.lower()) # Actual filenames do not contain captial letters.
     dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), str(article_no), new_filename)
     log.write("Copying file {} to {}.\n".format(src, dst))
 
