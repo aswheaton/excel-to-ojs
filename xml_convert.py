@@ -69,27 +69,27 @@ def indent():
 def open_tag(tag_name):
 
     global indent_level
-    f.write(indent()+"<"+tag_name+">\n")
+    xml_file.write(indent()+"<"+tag_name+">\n")
     indent_level += 1
 
 def close_tag(tag_name):
 
     global indent_level
     indent_level -= 1
-    f.write(indent()+"</"+tag_name+">\n")
+    xml_file.write(indent()+"</"+tag_name+">\n")
 
 def tag(tag_name, tag_content, **kwargs):
 
-    f.write(indent())
+    xml_file.write(indent())
     # Open the tag with any keyword arguments.
-    f.write("<"+tag_name)
+    xml_file.write("<"+tag_name)
     for key, value in kwargs:
         f.write(" "+key+"=\""+value)+"\""
-    f.write(">")
+    xml_file.write(">")
     # Fill the tag with content.
-    f.write(tag_content)
+    xml_file.write(tag_content)
     # Close the tag and move to newline.
-    f.write("</"+tag_name+">\n")
+    xml_file.write("</"+tag_name+">\n")
 
 """
 Notes:
