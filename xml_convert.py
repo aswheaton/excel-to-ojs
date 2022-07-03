@@ -153,35 +153,20 @@ for row in range(1, 10): # dataframe.shape[0]):
     open_tag("document")
 
     title = dataframe[row][1]
-    # f.write(indent()+"<titles>\n")
-    # indent_level += 1
-    # f.write(indent()+"<title>\n")
-    # indent_level += 1
-    # f.write(indent()+title+"\n")
-    # indent_level -= 1
-    # f.write(indent()+"</title>\n")
-    # indent_level -= 1
-    # f.write(indent()+"</titles>\n")
-    # indent_level -= 1
     open_tag("titles")
     tag("title", title)
     close_tag("titles")
 
-    volume_no = int(dataframe[row][5])
+    # volume_no = int(dataframe[row][5])
     pubyear = dataframe[row][3]
     if volume_no % 2 != 0:
         pubdate = str(pubyear)+"-06-30:T00:00:00-07:00" # Why this particular date format?
     elif volume_no % 2 == 0:
         pubdate = str(pubyear)+"-12-31:T00:00:00-07:00" # Why this particular date format?
-    # f.write(indent()+"<publication-date>" + pubdate + "</publication-date>" + "\n")
-    # f.write(indent()+"<state>published</state>\n")
     tag("publication-date", pubdate)
     tag("state", "published")
 
-    # f.write(indent()+"<authors>\n")
-    # indent_level += 1
     open_tag("authors")
-
     authors = dataframe[row][0]
     author_list = authors.split(";")
 
@@ -208,41 +193,18 @@ for row in range(1, 10): # dataframe.shape[0]):
             pass
 
         close_tag("author")
-
-        # f.write(indent()+"<author>\n")
-        # indent_level += 1
-        # f.write(indent()+"<lname>"+author.split(" ")[0]+"</lname>\n")
-        # f.write(indent()+"<fname>"+author.split(" ")[-1]+"</fname>\n")
-        # try:
-        #     f.write(indent()+"<mname>"+author.split(" ")[1]+"</mname>\n")
-        # except IndexError:
-        #     pass
-        # indent_level -= 1
-        # f.write(indent()+"</author>\n")
-
-    # indent_level -= 1
-    # f.write(indent()+"</authors>\n")
     close_tag("authors")
 
     abstract = dataframe[row][8]
-    # f.write(indent()+"<abstract>"+abstract+"</abstract>\n")
     tag("abstract", abstract)
 
     section = dataframe[row][4]
-    # f.write(indent()+"<document-type>"+section+"</document-type>\n")
-    # f.write(indent()+"<type>article</type>\n")
     tag("document-type", section)
     tag("type", "article")
 
     page_start, page_end = dataframe[row][6], dataframe[row][7]
-    # f.write(indent()+"<fpage>"+page_start+"</fpage>\n")
-    # f.write(indent()+"<lpage>"+page_end+"</lpage>\n")
     tag("fpage", page_start)
     tag("lpage", page_end)
 
-    # indent_level -= 1
-    # f.write(indent()+"</document>\n")
-    # indent_level -=1
-    # f.write(indent()+"</documents>")
     close_tag("document")
     close_tag("documents")
