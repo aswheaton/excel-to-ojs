@@ -248,4 +248,17 @@ for row in range(1, dataframe.shape[0]):
 
     xml_file.close()
 
+for volume_no in range(1,42):
+
+    issue_no = 1
+
+    if volume_no < 10:
+        old_cover_filename = "cv-pachy0" + str(volume_no) + ".jpg"
+    else:
+        old_cover_filename = "cv-pachy" + str(volume_no) + ".jpg"
+
+    src = os.path.join("database/covers/", old_cover_filename)
+    dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), "cover.jpg")
+    shutil.copy2(src, dst)
+
 log.close()
