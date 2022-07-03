@@ -192,24 +192,45 @@ for row in range(1, 10): # dataframe.shape[0]):
 
         names = author.strip().split(" ")
         lname = names[0].strip(",")
-        tag("lname", lname)
+
+        if lname in author_emails.keys():
+            author_email = author_emails[lname]
+        else:
+            author_email = "example@example.com"
 
         try:
             fname = names[1]
-            tag("fname", fname)
         except IndexError:
-            pass
-
+            fname = None
         try:
             mname = names[2]
             for i in range(3, len(names)):
                 mname += " " + names[i]
-            tag("mname", mname)
         except IndexError:
-            pass
+            mname = None
+
+        tag("email", author_email)
+        if lname != None:
+            tag("lname", lname)
+        if fname != None:
+            tag("fname", fname)
+        if mname != None:
+            tag("mname", mname)
+
+        # print(author.strip())
+        # print(lname+"!")
+        # try:
+        #     print(fname+"!")
+        # except TypeError:
+        #     pass
+        # try:
+        #     print(mname+"!")
+        # except TypeError:
+        #     pass
 
         close_tag("author")
     close_tag("authors")
+
 
     abstract = dataframe[row][8]
     tag("abstract", abstract)
