@@ -118,7 +118,7 @@ TODO: Some filenames in database have capital P, although no such file exists. F
 TODO: Check logic of directory structure creation for missing file in row 1.
 """
 
-for row in range(1, 10): # dataframe.shape[0]):
+for row in range(1, dataframe.shape[0]):
     #Get essential info out of the file.
     volume_no = int(dataframe[row][5])
     issue_no = 1
@@ -144,17 +144,17 @@ for row in range(1, 10): # dataframe.shape[0]):
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename.lower()) # Actual filenames do not contain captial letters.
     dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), str(article_no), new_filename)
-    log.write("Copying file {} to {}.\n".format(src, dst))
 
     if not os.path.exists(dst):
         try:
             shutil.copy2(src, dst)
+            log.write("Copied file {} to {}.\n".format(src, dst))
         except FileNotFoundError:
             src = input("No file found at {}, input source or skip: ".format(src))
             if src != "skip":
                 shutil.copy2(src, dst)
             else:
-                pass
+                log.write("Could not find a file at {}, writing metadata anyway.".format(src))
 
     # Now create the requisite metadata file for the article.
     xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(volume_no, issue_no, article_no)
@@ -245,3 +245,7 @@ for row in range(1, 10): # dataframe.shape[0]):
 
     close_tag("document")
     close_tag("documents")
+
+    xml_file.close()
+
+log.close()
