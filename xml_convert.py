@@ -101,12 +101,8 @@ TODO: Number of rows does NOT match number of files in database/articles (extra 
 TODO: It appears that some files are referenced by multiple rows, for short articles. FIXED!
 TODO: Not clear wwhat purpose the final column serves. FIXED!
 TODO: Some filenames in database have capital P, although no such file exists. FIXED!
+TODO: Check logic of directory structure creation for missing file in row 1.
 """
-
-for volume in range(1, 42):
-    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"):
-        os.makedirs("bepress_xml/"+str(volume)+"/1/", mode=0o777)
-        log.write("Created directory bepress_xml/{}/1/ with permissions 777.\n".format(volume))
 
 for row in range(1, 10): # dataframe.shape[0]):
     #Get essential info out of the file.
@@ -127,9 +123,9 @@ for row in range(1, 10): # dataframe.shape[0]):
     old_filename = str(dataframe[row][10])
     new_filename = old_filename.lower()
 
-    if not os.path.exists("bepress_xml/"+str(volume)+"/1/"+article_no):
-        os.makedirs("bepress_xml/"+str(volume)+"/1/"+article_no, mode=0o777)
-        log.write("Created directory bepress_xml/{}/{}/{} with permissions 777.\n".format(volume, issue_no, article_no))
+    if not os.path.exists("bepress_xml/"+str(volume_no)+"/1/"+str(article_no)):
+        os.makedirs("bepress_xml/"+str(volume_no)+"/1/"+str(article_no), mode=0o777)
+        log.write("Created directory bepress_xml/{}/{}/{} with permissions 777.\n".format(volume_no, issue_no, article_no))
 
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename)
@@ -147,7 +143,7 @@ for row in range(1, 10): # dataframe.shape[0]):
                 pass
 
     # Now create the requisite metadata file for the article.
-    xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(str(volume_no), str(issue_no), str(article_no))
+    xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(volume_no, issue_no, article_no)
     xml_file = open(xml_file_path, "w")
     indent_level = 0
 
