@@ -158,11 +158,13 @@ for row in range(1, 10): # dataframe.shape[0]):
     close_tag("titles")
 
     # volume_no = int(dataframe[row][5])
-    pubyear = dataframe[row][3]
-    if volume_no % 2 != 0:
-        pubdate = str(pubyear)+"-06-30:T00:00:00-07:00" # Why this particular date format?
-    elif volume_no % 2 == 0:
-        pubdate = str(pubyear)+"-12-31:T00:00:00-07:00" # Why this particular date format?
+    # pubyear = dataframe[row][3]
+    # if volume_no % 2 != 0:
+    #     pubdate = str(pubyear)+"-06-30:T00:00:00-07:00" # Why this particular date format?
+    # elif volume_no % 2 == 0:
+    #     pubdate = str(pubyear)+"-12-31:T00:00:00-07:00" # Why this particular date format?
+
+    pubdate = pubdates[volume_no]
     tag("publication-date", pubdate)
     tag("state", "published")
 
