@@ -1,2 +1,8 @@
+__pycache__/*
+
+bepress/*
+bepress_xml/*
+database/*
+
 database/articles/*
 database/covers/*
