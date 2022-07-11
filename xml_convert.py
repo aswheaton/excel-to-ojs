@@ -212,11 +212,11 @@ for row in range(1, dataframe.shape[0]):
 
         tag("email", author_email)
         if lname != None:
-            tag("lname", lname)
+            tag("lname", lname, locale="en_US")
         if fname != None:
-            tag("fname", fname)
+            tag("fname", fname, locale="en_US")
         if mname != None:
-            tag("mname", mname)
+            tag("mname", mname, locale="en_US")
 
         close_tag("author")
     close_tag("authors")
@@ -224,6 +224,10 @@ for row in range(1, dataframe.shape[0]):
 
     abstract = dataframe[row][8]
     tag("abstract", abstract)
+
+    open_tag("galleys")
+    tag("galley", new_filename, locale="en_US")
+    close_tag("galleys")
 
     section = dataframe[row][4]
     tag("document-type", section)
