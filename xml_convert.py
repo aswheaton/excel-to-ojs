@@ -99,8 +99,8 @@ def tag(tag_name, tag_content, **kwargs):
     xml_file.write(indent())
     # Open the tag with any keyword arguments.
     xml_file.write("<"+tag_name)
-    for key, value in kwargs:
-        f.write(" "+key+"=\""+value)+"\""
+    for key, value in kwargs.items():
+        xml_file.write(" " + key + "=\"" + value + "\"")
     xml_file.write(">")
     # Fill the tag with content.
     xml_file.write(tag_content)
