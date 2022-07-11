@@ -65,10 +65,12 @@ log = open("log", "w")
 dataframe = np.loadtxt("database/Pachy.csv",dtype=str,delimiter="	")
 log.write("Successfully loaded CSV file into dataframe.\n")
 
+aggregate_authors = []
+
 def view_headers(dataframe):
 
     print(dataframe[0,:])
-    log.write("Viewing dataframe headers, they are {}.\n".format(dataframe[0,:]))
+    # log.write("Viewing dataframe headers, they are {}.\n".format(dataframe[0,:]))
 
 def view_column(dataframe, column_name):
     # Get index associated with the column name:
@@ -110,18 +112,23 @@ Notes:
 TODO: Papers with multiple authors have line ending semicolon, single authors do not! FIXED!
 TODO: Sec_title column has both "African Elephant and Rhino Group Newsletter" and "Pachyderm".
 TODO: Capitalisation differs for Section column, i.e. "Rhino Notes" and "Rhino notes".
-TODO: Volume contains entries for Vol 42, for which there are no filenames.
-TODO: Number of rows does NOT match number of files in database/articles (extra rows)
+TODO: Volume contains entries for Vol 42, for which there are no filenames. FIXED!
+TODO: Number of rows does NOT match number of files in database/articles (extra rows) FIXED!
 TODO: It appears that some files are referenced by multiple rows, for short articles. FIXED!
-TODO: Not clear wwhat purpose the final column serves. FIXED!
+TODO: Not clear what purpose the final column serves. FIXED!
 TODO: Some filenames in database have capital P, although no such file exists. FIXED, kinda!
-TODO: Check logic of directory structure creation for missing file in row 1.
+TODO: Check logic of directory structure creation for missing file in row 1. WORKS!
+TODO: Add section names (either <type> or <document-type>) and <galley> tags.
 """
 
 for row in range(1, dataframe.shape[0]):
     #Get essential info out of the file.
     volume_no = int(dataframe[row][5])
     issue_no = 1
+
+    if volume_no == 42:
+        log.write("Volume number exceeds available galleys! Stopping conversion.\n")
+        break
 
     # If this is the first article in the first issue, start an article counter at 1.
     if row == 1:
@@ -150,11 +157,7 @@ for row in range(1, dataframe.shape[0]):
             shutil.copy2(src, dst)
             log.write("Copied file {} to {}.\n".format(src, dst))
         except FileNotFoundError:
-            src = input("No file found at {}, input source or skip: ".format(src))
-            if src != "skip":
-                shutil.copy2(src, dst)
-            else:
-                log.write("Could not find a file at {}, writing metadata anyway.".format(src))
+            log.write("Error in row {}. Could not find a file at {}, writing metadata anyway.\n".format(row+1, src))
 
     # Now create the requisite metadata file for the article.
     xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(volume_no, issue_no, article_no)
@@ -171,13 +174,6 @@ for row in range(1, dataframe.shape[0]):
     tag("title", title)
     close_tag("titles")
 
-    # volume_no = int(dataframe[row][5])
-    # pubyear = dataframe[row][3]
-    # if volume_no % 2 != 0:
-    #     pubdate = str(pubyear)+"-06-30:T00:00:00-07:00" # Why this particular date format?
-    # elif volume_no % 2 == 0:
-    #     pubdate = str(pubyear)+"-12-31:T00:00:00-07:00" # Why this particular date format?
-
     pubdate = pubdates[volume_no]
     tag("publication-date", pubdate)
     tag("state", "published")
@@ -188,6 +184,8 @@ for row in range(1, dataframe.shape[0]):
 
     for author in author_list:
 
+        aggregate_authors.append(author.strip())
+
         open_tag("author")
 
         names = author.strip().split(" ")
@@ -196,7 +194,7 @@ for row in range(1, dataframe.shape[0]):
         if lname in author_emails.keys():
             author_email = author_emails[lname]
         else:
-            author_email = "example@example.com"
+            author_email = "AfESG@iucn.org"
 
         try:
             fname = names[1]
@@ -216,17 +214,6 @@ for row in range(1, dataframe.shape[0]):
             tag("fname", fname)
         if mname != None:
             tag("mname", mname)
-
-        # print(author.strip())
-        # print(lname+"!")
-        # try:
-        #     print(fname+"!")
-        # except TypeError:
-        #     pass
-        # try:
-        #     print(mname+"!")
-        # except TypeError:
-        #     pass
 
         close_tag("author")
     close_tag("authors")
@@ -260,5 +247,68 @@ for volume_no in range(1,42):
     src = os.path.join("database/covers/", old_cover_filename)
     dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), "cover.jpg")
     shutil.copy2(src, dst)
+    log.write("Copied {} to {}.\n".format(src, dst))
+
+publication_threshold = 3
+
+unique_authors = np.unique(aggregate_authors).tolist()
+unique_authors.remove("")
+unique_author_contributions = []
+reduced_unique_authors = []
+
+for i in range(len(unique_authors)):
+    unique_author_contributions.append(aggregate_authors.count(unique_authors[i]))
+
+for i in range(len(unique_authors)):
+    if unique_author_contributions[i] >= publication_threshold:
+        reduced_unique_authors.append(unique_authors[i])
+
+# for i in range(len(reduced_unique_authors)):
+#     log.write("Author {} is a contributor on {} articles.\n".format(reduced_unique_authors[i], aggregate_authors.count(reduced_unique_authors[i])))
+
+contributions = 0
+for row in range(1, dataframe.shape[0]):
+    for author in reduced_unique_authors:
+        if author in dataframe[row,0]:
+            # log.write("Found {} in {}.\n".format(author, dataframe[row,0]))
+            contributions +=1
+            break
+
+log.write("Found {} unique authors who have published {} or more papers.\n".format(len(reduced_unique_authors), publication_threshold))
+log.write("The authors are:\n")
+for author in reduced_unique_authors:
+    log.write("{}; \n".format(author))
+log.write("{}% of contributions are from these {} individuals.\n".format(contributions/row*100, len(reduced_unique_authors)))
+
+"""
+Found 160 unique authors who have published 2 or more papers.
+79.50% of contributions are from these 160 individuals.
+Found 86 unique authors who have published 3 or more papers.
+68.27% of contributions are from these 86 individuals.
+Found 52 unique authors who have published 4 or more papers.
+59.26% of contributions are from these 52 individuals.
+Found 38 unique authors who have published 5 or more papers.
+53.39% of contributions are from these 38 individuals.
+Found 27 unique authors who have published 6 or more papers.
+47.91% of contributions are from these 27 individuals.
+Found 19 unique authors who have published 7 or more papers.
+42.55% of contributions are from these 19 individuals.
+Found 19 unique authors who have published 8 or more papers.
+42.55% of contributions are from these 19 individuals.
+Found 17 unique authors who have published 9 or more papers.
+40.73% of contributions are from these 17 individuals.
+Found 17 unique authors who have published 10 or more papers.
+40.73% of contributions are from these 17 individuals.
+
+2+ papers -> 160 unique authors comprising 79.50% of all articles.
+3+ papers -> 86 unique authors comprising 68.27% of all articles.
+4+ papers -> 52 unique authors comprising 59.26% of all articles.
+5+ papers -> 38 unique authors comprising 53.39% of all articles.
+6+ papers -> 27 unique authors comprising 47.91% of all articles.
+7+ papers -> 19 unique authors comprising 42.55% of all articles.
+8+ papers -> 19 unique authors comprising 42.55% of all articles.
+9+ papers -> 17 unique authors comprising 40.73% of all articles.
+10+ papers -> 17 unique authors comprising 40.73% of all articles.
+"""
 
 log.close()
