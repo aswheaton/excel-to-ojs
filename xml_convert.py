@@ -2,6 +2,8 @@ import os
 import numpy as np
 import shutil
 
+journal_name = "Pachyderm"
+
 pubdates = {
     1  : "1983-04-30:T12:00:00+03:00", # April 1983.
     2  : "1983-11-30:T12:00:00+03:00", # November 1983.
@@ -144,13 +146,14 @@ for row in range(1, dataframe.shape[0]):
     old_filename = str(dataframe[row][10])
     new_filename = old_filename.lower()
 
-    if not os.path.exists("bepress_xml/"+str(volume_no)+"/1/"+str(article_no)):
-        os.makedirs("bepress_xml/"+str(volume_no)+"/1/"+str(article_no), mode=0o777)
-        log.write("Created directory bepress_xml/{}/{}/{} with permissions 777.\n".format(volume_no, issue_no, article_no))
+    article_path = os.path.join("bepress_xml", journal_name, str(volume_no), str(issue_no), str(article_no))
+    if not os.path.exists(article_path):
+        os.makedirs(article_path, mode=0o777)
+        log.write("Created directory {} with permissions 777.\n".format(article_path))
 
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename.lower()) # Actual filenames do not contain captial letters.
-    dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), str(article_no), new_filename)
+    dst = os.path.join(article_path, new_filename)
 
     if not os.path.exists(dst):
         try:
@@ -160,7 +163,7 @@ for row in range(1, dataframe.shape[0]):
             log.write("Error in row {}. Could not find a file at {}, writing metadata anyway.\n".format(row+1, src))
 
     # Now create the requisite metadata file for the article.
-    xml_file_path = "bepress_xml/{}/{}/{}/metadata.xml".format(volume_no, issue_no, article_no)
+    xml_file_path = os.path.join(article_path, "metadata.xml")
     xml_file = open(xml_file_path, "w")
     indent_level = 0
 
@@ -245,7 +248,7 @@ for volume_no in range(1,42):
         old_cover_filename = "cv-pachy" + str(volume_no) + ".jpg"
 
     src = os.path.join("database/covers/", old_cover_filename)
-    dst = os.path.join("bepress_xml/", str(volume_no), str(issue_no), "cover.jpg")
+    dst = os.path.join("bepress_xml/", journal_name, str(volume_no), str(issue_no), "cover.jpg")
     shutil.copy2(src, dst)
     log.write("Copied {} to {}.\n".format(src, dst))
 
