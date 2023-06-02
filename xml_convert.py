@@ -324,6 +324,8 @@ for row in range(1, dataframe.shape[0]):
     tag("fpage", page_start)
     tag("lpage", page_end)
 
+    tag("publication-title", "Pachyderm")
+
     close_tag("document")
     close_tag("documents")
 
