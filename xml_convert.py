@@ -207,7 +207,7 @@ for row in range(1, dataframe.shape[0]):
 
     # Copy the file to its new directory, if not already present.
     src = os.path.join("database/articles/", old_filename.lower()) # Actual filenames do not contain captial letters.
-    dst = os.path.join(article_path, new_filename)
+    dst = os.path.join(article_path, "fulltext.pdf") # Used to be new_filename, but this is broken in import plugin.
 
     using_inclusive_pdf = False
 
