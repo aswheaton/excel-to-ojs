@@ -336,8 +336,6 @@ for row in range(1, dataframe.shape[0]):
 
 np.savetxt('database/Pachy.tsv', dataframe, fmt='%s', delimiter='	', newline='\n', header='', footer='', comments='# ', encoding=None)
 
-
-"""
 for volume_no in range(1,42):
 
     issue_no = 1
@@ -352,6 +350,7 @@ for volume_no in range(1,42):
     shutil.copy2(src, dst)
     log("Copied {} to {}.".format(src, dst))
 
+"""
 publication_threshold = 3
 
 unique_authors = np.unique(aggregate_authors).tolist()
