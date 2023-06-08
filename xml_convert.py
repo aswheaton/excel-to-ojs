@@ -167,7 +167,7 @@ aggregate_authors = []
 Notes:
 TODO: Papers with multiple authors have line ending semicolon, single authors do not! FIXED!
 TODO: Sec_title column has both "African Elephant and Rhino Group Newsletter" and "Pachyderm".
-TODO: Capitalisation differs for Section column, i.e. "Rhino Notes" and "Rhino notes".
+TODO: Capitalisation differs for Section column, i.e. "Rhino Notes" and "Rhino notes". FIXED in .csv!
 TODO: Volume contains entries for Vol 42, for which there are no filenames. FIXED!
 TODO: Number of rows does NOT match number of files in database/articles (extra rows) FIXED!
 TODO: It appears that some files are referenced by multiple rows, for short articles. FIXED!
