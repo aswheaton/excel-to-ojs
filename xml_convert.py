@@ -272,6 +272,9 @@ for row in range(1, dataframe.shape[0]):
         names = author.strip().split(" ")
         lname = names[0].strip(",")
 
+        if (len(lname) == 0) or (lname == None):
+            continue
+
         if lname in author_emails.keys():
             author_email = author_emails[lname]
         else:
@@ -300,7 +303,7 @@ for row in range(1, dataframe.shape[0]):
     close_tag("authors")
 
 
-    abstract = dataframe[row][8]
+    abstract = "&lt;p&gt;" + dataframe[row][8]
     tag("abstract", abstract)
 
     open_tag("galleys")
