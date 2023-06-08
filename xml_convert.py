@@ -303,7 +303,9 @@ for row in range(1, dataframe.shape[0]):
     close_tag("authors")
 
 
-    abstract = "&lt;p&gt;" + dataframe[row][8]
+    abstract = dataframe[row][8]
+    if len(abstract) != 0:
+        abstract = "&lt;p&gt;" + abstract + "&lt;/p&gt;"
     tag("abstract", abstract)
 
     open_tag("galleys")
